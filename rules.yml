@@ -1,0 +1,64 @@
+# rules.yml
+
+project:
+  name: Gestion des Présences Employés
+  tech_stack: Flutter
+  architecture: MVC
+  data_source: local_storage
+  network: offline
+  api_calls: false
+  language: Dart
+
+preferences:
+  component_reusability: true
+  performance_optimized: true
+  offline_first: true
+  modular_structure: true
+
+structure:
+  folders:
+    - models/
+    - views/
+    - controllers/
+    - components/
+    - utils/
+    - assets/
+    - services/  # utilisé uniquement pour des opérations métier complexes, facultatif
+
+agent_objectives:
+  - Générer des composants UI réutilisables (inputs, boutons, cartes, tableaux)
+  - Générer un tableau hebdomadaire de présence basé sur un fichier Excel local
+  - Permettre des filtres (par nom ou semaine)
+  - Implémenter la logique des heures supplémentaires
+  - Organiser le code selon l'architecture MVC
+  - Ne pas générer de code d'appel API
+  - Utiliser uniquement des sources de données locales (fichiers, bases locales)
+  - Générer du code clair, modulaire, bien documenté
+  - Créer des widgets personnalisés dans components/
+  - Séparer la logique métier dans controllers/ et services/ si nécessaire
+  - Respecter les conventions de nommage Flutter/Dart
+
+constraints:
+  - Pas d’utilisation de packages HTTP ou connectés à Internet
+  - Pas de Firebase, REST, GraphQL ou tout backend distant
+  - Stockage uniquement local (SharedPreferences, fichiers, SQLite)
+  - Compatibilité mobile uniquement (Android, iOS)
+
+examples:
+  - components/employee_card.dart → Widget réutilisable pour un employé
+  - controllers/attendance_controller.dart → Gère les calculs de présence
+  - views/weekly_attendance.dart → Affiche les présences de la semaine
+  - utils/date_helper.dart → Fonctions pour manipuler les semaines
+
+notes:
+  - Adapter les composants pour une bonne lisibilité sur tablette
+  - Prévoir l’import de fichiers Excel depuis le stockage local
+  - Générer des fonctions pour convertir un fichier Excel en liste d’objets employés
+  - Tous les calculs (retards, heures supp) doivent être faits côté Flutter
+
+copilot_instructions:
+  - Suivre ce fichier comme directive de projet
+  - Générer uniquement du code Flutter/Dart
+  - Ne jamais suggérer d’API externe
+  - Prioriser la réutilisabilité et la clarté
+
