@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../app_routes.dart';
+import '../controllers/auth_controller.dart';
 
 class ScanPage extends StatelessWidget {
+  final AuthController authController = Get.find();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -12,7 +14,14 @@ class ScanPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 5),
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () async {
+                await authController.checkAdminExists();
+                if (authController.hasAdmin.value) {
+                  Get.toNamed('/login');
+                } else {
+                  Get.toNamed('/register');
+                }
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
               ),
@@ -21,12 +30,7 @@ class ScanPage extends StatelessWidget {
           ),
         ],
       ),
-      body: Stack(
-        children: [
-          Center(child: Text('Page de scan')),
-          //
-        ],
-      ),
+      body: Center(child: Text('Page de scan')),
     );
   }
 }

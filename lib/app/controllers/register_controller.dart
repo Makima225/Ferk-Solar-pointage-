@@ -1,5 +1,8 @@
+
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import '../models/user_model.dart';
+import '../services/user_service.dart';
 
 class RegisterController extends GetxController {
   final nameCtrl = TextEditingController();
@@ -30,14 +33,30 @@ class RegisterController extends GetxController {
     return null;
   }
 
-  void registerAdmin(BuildContext context, GlobalKey<FormState> formKey) {
+  Future<void> registerAdmin(BuildContext context, GlobalKey<FormState> formKey) async {
     if (!formKey.currentState!.validate()) return;
     isLoading.value = true;
-    // Ici, ajouter la logique d'enregistrement local (SharedPreferences, SQLite, etc.)
-    Future.delayed(Duration(seconds: 1), () {
+    try {
+      final user = User(
+        name: nameCtrl.text.trim(),
+        username: usernameCtrl.text.trim(),
+        password: passwordCtrl.text,
+      );
+      await UserService().insertUser(user);
       isLoading.value = false;
-      Get.snackbar('Succès', 'Admin enregistré (logique à implémenter)', snackPosition: SnackPosition.BOTTOM);
-    });
+      Get.snackbar('Succès', 'Admin enregistré avec succès', snackPosition: SnackPosition.BOTTOM);
+      Future.delayed(const Duration(milliseconds: 800), () {
+        Get.offAllNamed('/login');
+      });
+    } catch (e) {
+      isLoading.value = false;
+      String errorMsg = e.toString();
+      if (errorMsg.contains('UNIQUE constraint failed')) {
+        Get.snackbar('Erreur', 'Nom d\'utilisateur déjà utilisé', snackPosition: SnackPosition.BOTTOM);
+      } else {
+        Get.snackbar('Erreur', 'Erreur lors de l\'enregistrement : $errorMsg', snackPosition: SnackPosition.BOTTOM);
+      }
+    }
   }
 
   @override

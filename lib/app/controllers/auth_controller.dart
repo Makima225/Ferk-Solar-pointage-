@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/user_model.dart';
+import '../services/user_service.dart';
 
 class AuthController extends GetxController {
   var isAdminLogged = false.obs;
@@ -11,24 +13,22 @@ class AuthController extends GetxController {
     checkAdminExists();
   }
 
+
   Future<void> checkAdminExists() async {
-    final prefs = await SharedPreferences.getInstance();
-    hasAdmin.value = prefs.containsKey('admin_username');
+    hasAdmin.value = await UserService().hasAnyUser();
   }
 
+
   Future<void> registerAdmin(String name, String username, String password) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('admin_name', name);
-    await prefs.setString('admin_username', username);
-    await prefs.setString('admin_password', password);
+    final user = User(name: name, username: username, password: password);
+    await UserService().insertUser(user);
     hasAdmin.value = true;
   }
 
+
   Future<bool> login(String username, String password) async {
-    final prefs = await SharedPreferences.getInstance();
-    final storedUser = prefs.getString('admin_username');
-    final storedPass = prefs.getString('admin_password');
-    if (username == storedUser && password == storedPass) {
+    final user = await UserService().getUserByUsername(username);
+    if (user != null && user.password == password) {
       isAdminLogged.value = true;
       return true;
     }
