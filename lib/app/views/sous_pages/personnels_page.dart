@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../models/personnel_model.dart';
 import '../../controllers/personnel_controller.dart';
+import 'qr_personnel_page.dart';
 
 class PersonnelsPage extends StatelessWidget {
   final int entrepriseId;
@@ -26,9 +27,15 @@ class PersonnelsPage extends StatelessWidget {
             final pers = personnels[index];
             return ListTile(
               leading: IconButton(
-                icon: Icon(Icons.qr_code),
+                icon: Icon(Icons.qr_code, color: Colors.blue),
                 tooltip: 'Voir le QR code',
-                onPressed: () => _showQrDialog(context, pers),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => QrPersonnelPage(personnel: pers),
+                    ),
+                  );
+                },
               ),
               title: Text(pers.nomComplet, style: TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text(pers.fonction),
@@ -71,26 +78,6 @@ class PersonnelsPage extends StatelessWidget {
         onPressed: () => _showCreatePersonnelDialog(context, entrepriseId),
         child: Icon(Icons.person_add),
         backgroundColor: Colors.blue,
-      ),
-    );
-  }
-
-  void _showQrDialog(BuildContext context, Personnel pers) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('QR Code'),
-        content: QrImageView(
-          data: pers.uuid,
-          version: QrVersions.auto,
-          size: 200.0,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Fermer'),
-          ),
-        ],
       ),
     );
   }
