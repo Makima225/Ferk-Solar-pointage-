@@ -52,7 +52,7 @@ class EntreprisePage extends StatelessWidget {
               index: controller.selectedIndex.value,
               children: [
                 PersonnelsPage(entrepriseId: entreprise.id!),
-                const ListePresencePage(),
+                ListePresencePage(entrepriseId: entreprise.id!),
                 const StatistiquesPage(),
               ],
             )),

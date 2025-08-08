@@ -62,6 +62,18 @@ class ProjetService {
             FOREIGN KEY(entrepriseId) REFERENCES entreprises(id) ON DELETE CASCADE
           )
         ''');
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS pointages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            personnelId INTEGER NOT NULL,
+            date TEXT NOT NULL,
+            heureEntree TEXT,
+            heureSortie TEXT,
+            retardMinutes INTEGER,
+            heuresSuppMinutes INTEGER,
+            FOREIGN KEY(personnelId) REFERENCES personnels(id) ON DELETE CASCADE
+          )
+        ''');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
