@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import '../models/entreprise_model.dart';
 import 'package:get/get.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import '../models/entreprise_model.dart';
+import 'sous_pages/personnels_page.dart';
+import 'sous_pages/liste_presence_page.dart';
+import 'sous_pages/statistiques_page.dart';
 import '../controllers/entreprise_page_controller.dart';
 
 class EntreprisePage extends StatelessWidget {
@@ -46,10 +50,10 @@ class EntreprisePage extends StatelessWidget {
           Expanded(
             child: Obx(() => IndexedStack(
               index: controller.selectedIndex.value,
-              children: const [
-                _PersonnelsPage(),
-                _ListePresencePage(),
-                _StatistiquesPage(),
+              children: [
+                PersonnelsPage(entrepriseId: entreprise.id!),
+                const ListePresencePage(),
+                const StatistiquesPage(),
               ],
             )),
           ),
@@ -79,13 +83,7 @@ class _NavButton extends StatelessWidget {
   }
 }
 
-class _PersonnelsPage extends StatelessWidget {
-  const _PersonnelsPage();
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text('Page Personnels', style: TextStyle(fontSize: 20)));
-  }
-}
+
 
 class _ListePresencePage extends StatelessWidget {
   const _ListePresencePage();

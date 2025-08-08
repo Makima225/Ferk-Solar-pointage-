@@ -50,6 +50,18 @@ class ProjetService {
             FOREIGN KEY(projetId) REFERENCES projets(id) ON DELETE CASCADE
           )
         ''');
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS personnels (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            uuid TEXT NOT NULL UNIQUE,
+            nom_complet TEXT NOT NULL,
+            fonction TEXT NOT NULL,
+            location TEXT,
+            entrepriseId INTEGER NOT NULL,
+            qr_code_path TEXT,
+            FOREIGN KEY(entrepriseId) REFERENCES entreprises(id) ON DELETE CASCADE
+          )
+        ''');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -61,6 +73,18 @@ class ProjetService {
               projetId INTEGER NOT NULL,
               UNIQUE(nom, projetId),
               FOREIGN KEY(projetId) REFERENCES projets(id) ON DELETE CASCADE
+            )
+          ''');
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS personnels (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              uuid TEXT NOT NULL UNIQUE,
+              nom_complet TEXT NOT NULL,
+              fonction TEXT NOT NULL,
+              location TEXT,
+              entrepriseId INTEGER NOT NULL,
+              qr_code_path TEXT,
+              FOREIGN KEY(entrepriseId) REFERENCES entreprises(id) ON DELETE CASCADE
             )
           ''');
         }
