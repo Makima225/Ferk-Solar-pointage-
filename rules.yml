@@ -62,3 +62,45 @@ copilot_instructions:
   - Ne jamais suggérer d’API externe
   - Prioriser la réutilisabilité et la clarté
 
+models_Django:
+  # --- Modèle Projet (chantier) ---
+  Projet:
+    nom: CharField(max_length=100, unique=True)
+
+  # --- Horaire par jour pour chaque projet ---
+  HoraireProjet:
+    projet: ForeignKey(Projet, on_delete=CASCADE, related_name='horaires')
+    jour: CharField(max_length=10, choices=JOURS_SEMAINE)
+    heure_entree: TimeField()
+    heure_sortie: TimeField()
+    Meta:
+      unique_together: ['projet', 'jour']
+
+  # --- Entreprise affectée à un projet ---
+  Entreprise:
+    nom: CharField(max_length=100)
+    type_entreprise: CharField(max_length=200, choices=TYPE_ENTREPRISE_CHOICES, default='Entreprise de Vinci')
+    projet: ForeignKey(Projet, on_delete=CASCADE, related_name='entreprises')
+    Meta:
+      unique_together: ['nom', 'projet']
+
+  # --- Personnel (ouvrier) avec QR code ---
+  Personnel:
+    uuid: UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    nom_complet: CharField(max_length=100)
+    fonction: CharField(max_length=100)
+    location: CharField(max_length=100, blank=True, null=True)
+    entreprise: ForeignKey(Entreprise, on_delete=CASCADE, related_name='personnels')
+    qr_code: ImageField(upload_to='qr_codes/', blank=True, null=True)
+
+  # --- Pointage (entrée / sortie) ---
+  Pointage:
+    personnel: ForeignKey(Personnel, on_delete=CASCADE, related_name='pointages')
+    entreprise: ForeignKey(Entreprise, on_delete=CASCADE, related_name='pointages', null=True, blank=True)
+    date: DateField()
+    heure: TimeField()
+    retard: DurationField(blank=True, null=True)
+    type_pointage: CharField(max_length=10, choices=TYPE_CHOICES)
+    synchronise: BooleanField(default=False)
+   
+

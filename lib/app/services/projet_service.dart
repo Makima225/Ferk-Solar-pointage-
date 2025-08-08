@@ -21,7 +21,7 @@ class ProjetService {
     final path = join(dbPath, 'projets.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 2, // Incrémente la version pour déclencher onUpgrade
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE projets(
@@ -40,6 +40,30 @@ class ProjetService {
             FOREIGN KEY(projetId) REFERENCES projets(id) ON DELETE CASCADE
           )
         ''');
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS entreprises (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nom TEXT NOT NULL,
+            type_entreprise TEXT NOT NULL,
+            projetId INTEGER NOT NULL,
+            UNIQUE(nom, projetId),
+            FOREIGN KEY(projetId) REFERENCES projets(id) ON DELETE CASCADE
+          )
+        ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS entreprises (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              nom TEXT NOT NULL,
+              type_entreprise TEXT NOT NULL,
+              projetId INTEGER NOT NULL,
+              UNIQUE(nom, projetId),
+              FOREIGN KEY(projetId) REFERENCES projets(id) ON DELETE CASCADE
+            )
+          ''');
+        }
       },
     );
   }
