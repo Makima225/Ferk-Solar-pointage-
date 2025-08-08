@@ -25,13 +25,44 @@ class PersonnelsPage extends StatelessWidget {
           itemBuilder: (context, index) {
             final pers = personnels[index];
             return ListTile(
-              leading: QrImageView(
-                data: pers.uuid,
-                version: QrVersions.auto,
-                size: 40.0,
+              leading: IconButton(
+                icon: Icon(Icons.qr_code),
+                tooltip: 'Voir le QR code',
+                onPressed: () => _showQrDialog(context, pers),
               ),
               title: Text(pers.nomComplet, style: TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text(pers.fonction),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.edit, color: Colors.orange),
+                    tooltip: 'Modifier',
+                    onPressed: () => _showEditPersonnelDialog(context, pers, personnelController),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.delete, color: Colors.red),
+                    tooltip: 'Supprimer',
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text('Supprimer'),
+                          content: Text('Supprimer ce personnel ?'),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Annuler')),
+                            ElevatedButton(onPressed: () => Navigator.pop(context, true), child: Text('Supprimer')),
+                          ],
+                        ),
+                      );
+                      if (confirm == true) {
+                        await personnelController.deletePersonnel(pers.id!, entrepriseId);
+                        Get.snackbar('Succès', 'Personnel supprimé');
+                      }
+                    },
+                  ),
+                ],
+              ),
             );
           },
         );
@@ -41,6 +72,85 @@ class PersonnelsPage extends StatelessWidget {
         child: Icon(Icons.person_add),
         backgroundColor: Colors.blue,
       ),
+    );
+  }
+
+  void _showQrDialog(BuildContext context, Personnel pers) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('QR Code'),
+        content: QrImageView(
+          data: pers.uuid,
+          version: QrVersions.auto,
+          size: 200.0,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Fermer'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditPersonnelDialog(BuildContext context, Personnel pers, PersonnelController personnelController) {
+    final _nomCtrl = TextEditingController(text: pers.nomComplet);
+    final _fonctionCtrl = TextEditingController(text: pers.fonction);
+    final _locationCtrl = TextEditingController(text: pers.location ?? '');
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Modifier le personnel'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _nomCtrl,
+                  decoration: InputDecoration(labelText: 'Nom complet'),
+                ),
+                SizedBox(height: 16),
+                TextField(
+                  controller: _fonctionCtrl,
+                  decoration: InputDecoration(labelText: 'Fonction'),
+                ),
+                SizedBox(height: 16),
+                TextField(
+                  controller: _locationCtrl,
+                  decoration: InputDecoration(labelText: 'Localisation (optionnel)'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Annuler'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final nom = _nomCtrl.text.trim();
+                final fonction = _fonctionCtrl.text.trim();
+                final location = _locationCtrl.text.trim().isEmpty ? null : _locationCtrl.text.trim();
+                if (nom.isEmpty || fonction.isEmpty) {
+                  Get.snackbar('Erreur', 'Nom et fonction requis');
+                  return;
+                }
+                await personnelController.service.updatePersonnel(
+                  pers.id!, nom, fonction, location
+                );
+                await personnelController.loadPersonnels(pers.entrepriseId);
+                Navigator.of(context).pop();
+                Get.snackbar('Succès', 'Personnel modifié');
+              },
+              child: Text('Enregistrer'),
+            ),
+          ],
+        );
+      },
     );
   }
 

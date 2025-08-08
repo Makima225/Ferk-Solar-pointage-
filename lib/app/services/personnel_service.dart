@@ -1,8 +1,22 @@
+
 import 'package:sqflite/sqflite.dart';
 import '../models/personnel_model.dart';
 import 'entreprise_service.dart';
 
 class PersonnelService {
+  Future<void> updatePersonnel(int id, String nomComplet, String fonction, String? location) async {
+    final db = await database;
+    await db.update(
+      'personnels',
+      {
+        'nom_complet': nomComplet,
+        'fonction': fonction,
+        'location': location,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
   Future<Database> get database async => EntrepriseService().database;
 
   Future<void> createTable(Database db) async {
